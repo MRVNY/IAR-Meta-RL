@@ -8,7 +8,7 @@ import scipy.misc
 import os
 import csv
 import itertools
-import tensorflow.contrib.slim as slim
+import tf_slim as slim
 from PIL import Image
 from PIL import ImageDraw 
 from PIL import ImageFont
