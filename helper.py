@@ -18,8 +18,8 @@ from graphviz import Digraph
 # Copies one set of variables to another.
 # Used to set worker network parameters to those of global network.
 def update_target_graph(from_scope,to_scope):
-    from_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, from_scope)
-    to_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, to_scope)
+    from_vars = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES, from_scope)
+    to_vars = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.TRAINABLE_VARIABLES, to_scope)
 
     op_holder = []
     for from_var,to_var in zip(from_vars,to_vars):
@@ -134,6 +134,5 @@ def make_frame(save_path, t_list, r_list, trial, action=-1, final_state=-1, rewa
     #print("saved ",title)
     dot
     return title+".png"
-    
     
     
