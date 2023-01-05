@@ -30,9 +30,9 @@ class two_step_task():
         self.last_state = None
     
     def get_state(self):
-        one_hot_array = [0.,0.,0.]
+        one_hot_array = np.zeros((3),dtype=np.float32)
         one_hot_array[self.state] = 1.0
-        return tf.convert_to_tensor(one_hot_array)
+        return one_hot_array
 
     def possible_switch(self):
         if (np.random.uniform() < 0.025):
@@ -141,6 +141,8 @@ class two_step_task():
         return new_state,reward,done,self.timestep
     
     def trial(self,action):
+        if (self.state == S_1):
+                self.possible_switch()
         # do one action in S_1, and keep track of the perceptually distinguishable state you arive in
         observation,_,_,_ = self.step(action)
         # do the same action in the resulting state (S_2 or S_3). The action doesn't matter, the reward does
