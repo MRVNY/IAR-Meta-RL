@@ -6,3 +6,6 @@ note.md
 .idea
 *_ignore
 Trash/
+*logs/
+*ckpt/
+*events.out.tfevents.*
