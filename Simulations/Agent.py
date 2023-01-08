@@ -27,6 +27,7 @@ class Agent():
         self.num_actions = num_actions
         self.num_hidden = num_hidden
         
+        self.path = path
         self.log_dir = path+'/logs/'
         self.ckpt_dir = path+'/ckpt/'
         self.test_dir = path+'/test/'
