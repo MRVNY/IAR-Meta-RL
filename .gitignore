@@ -9,3 +9,4 @@ Trash/
 *logs/
 *ckpt/
 *events.out.tfevents.*
+*copy.ipynb
