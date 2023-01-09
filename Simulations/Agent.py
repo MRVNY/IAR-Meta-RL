@@ -11,7 +11,8 @@ class Agent():
                  learning_rate, gamma, beta_v, beta_e,  #loss func
                  env, nb_trials, nb_episodes, has_obs,  #train
                  num_inputs, num_actions, num_hidden,   #lstm
-                 path                                   #tfboard & ckpt
+                 path,                                  #tfboard & ckpt
+                 action_per_trial=1
                  ) -> None:
         self.learning_rate = learning_rate
         self.gamma = gamma
@@ -22,6 +23,7 @@ class Agent():
         self.nb_trials = nb_trials
         self.nb_episodes = nb_episodes
         self.has_obs = has_obs
+        self.action_per_trial = action_per_trial
         
         self.num_inputs = num_inputs
         self.num_actions = num_actions
@@ -87,11 +89,11 @@ class Agent():
                 critic_value_history = []
                 rewards_history = []
                 reward = 0.0
-                action_onehot = np.zeros((2))
+                action_onehot = np.zeros((self.num_actions))
                 cell_state = [tf.zeros((1,self.num_hidden)),tf.zeros((1,self.num_hidden))]
                 entropy = 0.0
             
-                for timestep in range(self.nb_trials):
+                for timestep in range(self.nb_trials * self.action_per_trial):
                     input = np.concatenate((obs, action_onehot, [reward], [timestep]),dtype = np.float32)
                     input = tf.expand_dims(input,0)
                     
@@ -104,7 +106,7 @@ class Agent():
                     action_probs = tf.squeeze(action_probs)
                     action = np.random.choice(self.num_actions, p=action_probs.numpy())
                     action_probs_history.append(action_probs[action])
-                    action_onehot = np.zeros((2))
+                    action_onehot = np.zeros((self.num_actions))
                     action_onehot[action] = 1.0
 
                     # Apply the sampled action in our environment
@@ -158,7 +160,7 @@ class Agent():
             action_probs_history = []
             rewards_history = []
             reward = 0.0
-            action_onehot = np.zeros((2))
+            action_onehot = np.zeros((self.num_actions))
             cell_state = [tf.zeros((1,self.num_hidden)),tf.zeros((1,self.num_hidden))]
             entropy = 0.0
             
@@ -173,7 +175,7 @@ class Agent():
                 action_probs = tf.squeeze(action_probs)
                 action = np.random.choice(self.num_actions, p=action_probs.numpy())
                 action_probs_history.append(action_probs[action])
-                action_onehot = np.zeros((2))
+                action_onehot = np.zeros((self.num_actions))
                 action_onehot[action] = 1.0
 
                 # Apply the sampled action in our environment

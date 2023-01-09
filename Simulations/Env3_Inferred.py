@@ -1,19 +1,40 @@
 import numpy as np
 
-STIMU_1 = 0
-STIMU_2 = 1
+STIMU_L = 0
+CENTER = 1
+STIMU_R = 2
+FIXATION = np.array([0,1,0])
 
-class Monkey2():  
-    def __init__(self):
-        self.reset()
-        
+class Monkey2():
     def reset(self):
-        self.timestep = 0
+        self.timestep = -1
         self.done = False
-        self.rewarded_stimu = np.random.choice([STIMU_1,STIMU_2])
-        self.rewards = [0,0]
-        self.rewards[self.rewarded_stimu] = 1
-        
+        self.rewarded_stimu = np.random.choice([STIMU_L,STIMU_R])
+        self.reward = 0
+        return FIXATION
+    
+    # def step1(self):
+    #     return [0,1,0], 0, False, self.timestep
+    
+    def step1(self, action):
+        self.reward = 0
+        if action != 1:
+            self.reward = -1
+        self.target = np.random.choice([STIMU_L,STIMU_R])
+        obs = [0,0,0]
+        obs[self.target] = 1
+        return np.array(obs), self.reward, False, self.timestep
+    
+    def step2(self, action):
+        if self.reward != -1:
+            if action == 1:
+                self.reward = -1
+            elif action == self.rewarded_stimu:
+                self.reward = 1
+        return FIXATION, self.reward, self.timestep==9, self.timestep
+    
     def trial(self, action):
-        self.timestep +=  1
-        return self.rewards[action], self.timestep==5, self.timestep
+        self.timestep += 1
+        if self.timestep % 2 == 0:
+            return self.step1(action)
+        else: return self.step2(action)
