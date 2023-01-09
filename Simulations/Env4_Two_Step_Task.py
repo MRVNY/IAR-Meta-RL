@@ -1,4 +1,5 @@
 import numpy as np
+from Env_Model import *
 
 # encoding of the higher stages
 S_1 = 0
@@ -6,15 +7,16 @@ S_2 = 1
 S_3 = 2
 nb_states = 3
 
-class two_step_task():
+class Two_Step_Task(Env):
     def __init__(self):
+        super().__init__(nb_actions=2, nb_obs=3)
+        
         # start in S_1
         self.state = S_1
         
         # defines what is the stage with the highest expected reward. Initially random
         self.highest_reward_second_stage = np.random.choice([S_2,S_3])
         
-        self.num_actions = 2
         self.reset()
         
         # initialization of plotting variables
@@ -103,6 +105,9 @@ class two_step_task():
         self.state = S_1
         
         return self.get_state()
+    
+    def test_reset(self):
+        return self.reset()
         
     def step(self,action):
         self.timestep += 1

@@ -1,11 +1,16 @@
 import numpy as np
+from Env_Model import *
 
 STIMU_L = 0
 CENTER = 1
 STIMU_R = 2
 FIXATION = np.array([0,1,0])
 
-class Monkey2():
+class Inferred(Env):
+    
+    def __init__(self):
+        super().__init__(nb_actions=3, nb_obs=3, action_per_trial = 2)
+    
     def reset(self):
         self.timestep = -1
         self.done = False
@@ -13,8 +18,8 @@ class Monkey2():
         self.reward = 0
         return FIXATION
     
-    # def step1(self):
-    #     return [0,1,0], 0, False, self.timestep
+    def test_reset(self):
+        return self.reset()
     
     def step1(self, action):
         self.reward = 0

@@ -9,10 +9,9 @@ import scipy as sp
 class Agent():
     def __init__(self, 
                  learning_rate, gamma, beta_v, beta_e,  #loss func
-                 env, nb_trials, nb_episodes, has_obs,  #train
-                 num_inputs, num_actions, num_hidden,   #lstm
-                 path,                                  #tfboard & ckpt
-                 action_per_trial=1
+                 env, nb_trials, nb_episodes,       #train
+                 path,                              #tfboard & ckpt
+                 nb_hidden = 48
                  ) -> None:
         self.learning_rate = learning_rate
         self.gamma = gamma
@@ -22,12 +21,13 @@ class Agent():
         self.env = env
         self.nb_trials = nb_trials
         self.nb_episodes = nb_episodes
-        self.has_obs = has_obs
-        self.action_per_trial = action_per_trial
+        self.has_obs = env.has_obs
+        self.action_per_trial = env.action_per_trial
+        self.entropy_var = env.entropy_var
         
-        self.num_inputs = num_inputs
-        self.num_actions = num_actions
-        self.num_hidden = num_hidden
+        self.nb_inputs = env.nb_actions + env.nb_obs + 2
+        self.nb_actions = env.nb_actions
+        self.nb_hidden = nb_hidden
         
         self.path = path
         self.log_dir = path+'/logs/'
@@ -39,12 +39,12 @@ class Agent():
         
 
     def LSTM_Model(self):
-        inputs = layers.Input(shape=(self.num_inputs))
-        state_h = layers.Input(shape=(self.num_hidden))
-        state_c = layers.Input(shape=(self.num_hidden))
+        inputs = layers.Input(shape=(self.nb_inputs))
+        state_h = layers.Input(shape=(self.nb_hidden))
+        state_c = layers.Input(shape=(self.nb_hidden))
 
-        common, states = layers.LSTMCell(self.num_hidden)(inputs, states=[state_h, state_c], training=True)
-        action = layers.Dense(self.num_actions, activation="softmax")(common)
+        common, states = layers.LSTMCell(self.nb_hidden)(inputs, states=[state_h, state_c], training=True)
+        action = layers.Dense(self.nb_actions, activation="softmax")(common)
         critic = layers.Dense(1)(common)
 
         model = keras.Model(inputs=[inputs,state_h,state_c], outputs=[action, critic, states], )
@@ -68,7 +68,10 @@ class Agent():
 
         critic_loss = self.beta_v * 0.5 * tf.reduce_sum(input_tensor=tf.square(discounted_rewards - tf.reshape(values,[-1])))
         actor_loss = -tf.reduce_sum(tf.math.log(action_probs + 1e-7) * advantages)
-        entropy_loss = self.beta_e * entropy
+        if self.entropy_var:
+            entropy_loss = self.env.beta_e * entropy
+        else:
+            entropy_loss = self.beta_e * entropy
 
         total_loss = actor_loss + critic_loss + entropy
 
@@ -89,8 +92,8 @@ class Agent():
                 critic_value_history = []
                 rewards_history = []
                 reward = 0.0
-                action_onehot = np.zeros((self.num_actions))
-                cell_state = [tf.zeros((1,self.num_hidden)),tf.zeros((1,self.num_hidden))]
+                action_onehot = np.zeros((self.nb_actions))
+                cell_state = [tf.zeros((1,self.nb_hidden)),tf.zeros((1,self.nb_hidden))]
                 entropy = 0.0
             
                 for timestep in range(self.nb_trials * self.action_per_trial):
@@ -104,9 +107,9 @@ class Agent():
 
                     # Sample action from action probability distribution
                     action_probs = tf.squeeze(action_probs)
-                    action = np.random.choice(self.num_actions, p=action_probs.numpy())
+                    action = np.random.choice(self.nb_actions, p=action_probs.numpy())
                     action_probs_history.append(action_probs[action])
-                    action_onehot = np.zeros((self.num_actions))
+                    action_onehot = np.zeros((self.nb_actions))
                     action_onehot[action] = 1.0
 
                     # Apply the sampled action in our environment
@@ -152,16 +155,16 @@ class Agent():
 
         for episode in range(test_episode):
             if(self.has_obs):
-                obs = self.env.reset()
+                obs = self.env.test_reset()
             else: 
-                self.env.reset()
+                self.env.test_reset()
                 obs = []
             
             action_probs_history = []
             rewards_history = []
             reward = 0.0
-            action_onehot = np.zeros((self.num_actions))
-            cell_state = [tf.zeros((1,self.num_hidden)),tf.zeros((1,self.num_hidden))]
+            action_onehot = np.zeros((self.nb_actions))
+            cell_state = [tf.zeros((1,self.nb_hidden)),tf.zeros((1,self.nb_hidden))]
             entropy = 0.0
             
             for timestep in range(self.nb_trials):
@@ -173,9 +176,9 @@ class Agent():
                 
                 # Sample action from action probability distribution
                 action_probs = tf.squeeze(action_probs)
-                action = np.random.choice(self.num_actions, p=action_probs.numpy())
+                action = np.random.choice(self.nb_actions, p=action_probs.numpy())
                 action_probs_history.append(action_probs[action])
-                action_onehot = np.zeros((self.num_actions))
+                action_onehot = np.zeros((self.nb_actions))
                 action_onehot[action] = 1.0
 
                 # Apply the sampled action in our environment

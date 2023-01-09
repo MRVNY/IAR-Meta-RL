@@ -1,10 +1,11 @@
 import numpy as np
 import random
 from random import choice
+from Env_Model import *
 
-class foraging_task():
+class Two_Armed_Bandit(Env):
     def __init__(self):
-        self.num_actions = 2
+        super().__init__(nb_actions=3)
         self.reset()
     
     #set the baseline probability of reward for action a.
@@ -20,6 +21,9 @@ class foraging_task():
         variance = np.random.uniform(0,.1)
         self.baseline_prob = [variance,0.5-variance]
         #print("baseline prob",self.baseline_prob)
+        
+    def test_reset(self):
+        self.reset()
 
     ##get action from the network
     def pullArm(self,action):
