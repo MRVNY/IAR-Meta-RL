@@ -21,7 +21,6 @@ class Agent():
         self.env = env
         self.nb_trials = nb_trials
         self.nb_episodes = nb_episodes
-        self.has_obs = env.has_obs
         self.action_per_trial = env.action_per_trial
         self.entropy_var = env.entropy_var
         
@@ -82,7 +81,7 @@ class Agent():
         
         for episode in range(self.nb_episodes):
             with tf.GradientTape() as tape:
-                if(self.has_obs):
+                if(self.env.nb_obs>0):
                     obs = self.env.reset()
                 else: 
                     self.env.reset()
@@ -113,7 +112,7 @@ class Agent():
                     action_onehot[action] = 1.0
 
                     # Apply the sampled action in our environment
-                    if(self.has_obs):   
+                    if(self.env.nb_obs>0):   
                         obs, reward, done, _ = self.env.trial(action)
                     else: reward, done, _ = self.env.trial(action)
                     rewards_history.append(reward)
@@ -154,7 +153,7 @@ class Agent():
         test_summary_writer = tf.summary.create_file_writer(self.test_dir)
 
         for episode in range(test_episode):
-            if(self.has_obs):
+            if(self.env.nb_obs>0):
                 obs = self.env.test_reset()
             else: 
                 self.env.test_reset()
@@ -182,7 +181,7 @@ class Agent():
                 action_onehot[action] = 1.0
 
                 # Apply the sampled action in our environment
-                if(self.has_obs):   
+                if(self.env.nb_obs>0):   
                     obs, reward, done, _ = self.env.trial(action)
                 else: reward, done, _ = self.env.trial(action)
                 rewards_history.append(reward)

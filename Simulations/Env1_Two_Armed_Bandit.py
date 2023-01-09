@@ -5,7 +5,7 @@ from Env_Model import *
 
 class Two_Armed_Bandit(Env):
     def __init__(self):
-        super().__init__(nb_actions=3)
+        super().__init__(nb_actions=2)
         self.reset()
     
     #set the baseline probability of reward for action a.
@@ -26,7 +26,7 @@ class Two_Armed_Bandit(Env):
         self.reset()
 
     ##get action from the network
-    def pullArm(self,action):
+    def trial(self,action):
         self.timestep += 1    
         p_action_init = self.baseline_prob[action]
         p_action = p_action_init   

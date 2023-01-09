@@ -14,7 +14,7 @@ R = 1
 class Stable_Volatile_Bandit(Env):
     
     def __init__(self, nb_episodes=40000, nb_trials=400):
-        super().__init__(nb_actions=3, entropy_var=True)
+        super().__init__(nb_actions=2, entropy_var=True)
         self.nb_episodes = nb_episodes
         self.nb_trials = nb_trials
         self.beta_e = 1
