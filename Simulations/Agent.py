@@ -149,7 +149,7 @@ class Agent():
                 
         self.model.save(self.path+'/model.h5')
         
-    def test(self, test_episode, test_model):
+    def test(self, test_model, test_episode, nb_trials):
         test_summary_writer = tf.summary.create_file_writer(self.test_dir)
 
         for episode in range(test_episode):
@@ -166,7 +166,8 @@ class Agent():
             cell_state = [tf.zeros((1,self.nb_hidden)),tf.zeros((1,self.nb_hidden))]
             entropy = 0.0
             
-            for timestep in range(self.nb_trials):
+            for timestep in range(nb_trials * self.action_per_trial):
+                
                 input = np.concatenate((obs, action_onehot, [reward], [timestep]),dtype = np.float32)
                 input = tf.expand_dims(input,0)
                 

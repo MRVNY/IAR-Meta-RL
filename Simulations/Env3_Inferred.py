@@ -28,7 +28,7 @@ class Inferred(Env):
         self.target = np.random.choice([STIMU_L,STIMU_R])
         obs = [0,0,0]
         obs[self.target] = 1
-        return np.array(obs), self.reward, False, self.timestep
+        return np.array(obs), 0, False, self.timestep
     
     def step2(self, action):
         if self.reward != -1:
@@ -36,6 +36,7 @@ class Inferred(Env):
                 self.reward = -1
             elif action == self.rewarded_stimu:
                 self.reward = 1
+                
         return FIXATION, self.reward, self.timestep==9, self.timestep
     
     def trial(self, action):
