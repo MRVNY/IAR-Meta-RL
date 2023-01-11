@@ -12,11 +12,12 @@ class Two_Armed_Bandit(Env):
         self.actionR_history = []
         self.rewardL_history = []
         self.rewardR_history = []
+        self.training = True
         self.reset()
         
     def get_random_p0(self):
         p0 = np.random.uniform (0,.5)
-        if (0.1<p0 < 0.2 )or (0.3 < p0 < 0.4):
+        if (0.1<p0 < 0.2 )or (0.3 < p0 < 0.4) and self.training:
             return self.get_random_p0()
         return p0
     
@@ -35,6 +36,7 @@ class Two_Armed_Bandit(Env):
         self.baseline_prob = [variance,0.5-variance]
         
     def test_reset(self):
+        self.training = False
         if len(self.actionL_history) > 1000:
             self.actionL_history = []
             self.actionR_history = []
