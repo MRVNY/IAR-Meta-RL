@@ -90,6 +90,7 @@ class Agent():
                 action_probs_history = []
                 critic_value_history = []
                 rewards_history = []
+                action_history = []
                 reward = 0.0
                 action_onehot = np.zeros((self.nb_actions))
                 cell_state = [tf.zeros((1,self.nb_hidden)),tf.zeros((1,self.nb_hidden))]
@@ -110,6 +111,7 @@ class Agent():
                     action_probs_history.append(action_probs[action])
                     action_onehot = np.zeros((self.nb_actions))
                     action_onehot[action] = 1.0
+                    action_history.append(action)
 
                     # Apply the sampled action in our environment
                     if(self.env.nb_obs>0):   
@@ -141,6 +143,7 @@ class Agent():
                     tf.summary.scalar('loss/entropy', entropy_loss, step=episode)
                     tf.summary.scalar('game/reward', np.sum(rewards_history), step=episode)
                     tf.summary.histogram('game/action_probs', action_probs_history, step=episode)
+                    tf.summary.histogram('game/action_history', action_history, step=episode)
                 
             # Checkpoint
             if episode % 2000 == 0:
@@ -161,6 +164,8 @@ class Agent():
             
             action_probs_history = []
             rewards_history = []
+            action_history = []
+            onehot_history = []
             reward = 0.0
             action_onehot = np.zeros((self.nb_actions))
             cell_state = [tf.zeros((1,self.nb_hidden)),tf.zeros((1,self.nb_hidden))]
@@ -180,6 +185,8 @@ class Agent():
                 action_probs_history.append(action_probs[action])
                 action_onehot = np.zeros((self.nb_actions))
                 action_onehot[action] = 1.0
+                action_history.append(action)
+                onehot_history.append(action_onehot)
 
                 # Apply the sampled action in our environment
                 if(self.env.nb_obs>0):   
@@ -196,3 +203,6 @@ class Agent():
                 tf.summary.scalar('loss/entropy', entropy, step=episode)
                 tf.summary.scalar('game/reward', np.sum(rewards_history), step=episode)
                 tf.summary.histogram('game/action_probs', action_probs_history, step=episode)
+                tf.summary.histogram('game/action_history', action_history, step=episode)
+                tf.summary.histogram('game/onehot_history', onehot_history, step=episode)
+
