@@ -61,7 +61,7 @@ class Two_Armed_Bandit(Env):
         reward = int(np.random.rand() < p_action)
         self.reward_counter[action] += reward
         
-        self.last_seen[action] = 1
+        self.last_seen[action] = 0
         self.last_seen[1-action] += 1
         
         if self.timestep > self.timestepmax: 
