@@ -6,7 +6,6 @@ note.md
 .idea
 *_ignore
 Trash/
-*logs/
+logs/
 *ckpt/
-*events.out.tfevents.*
 *copy.ipynb
