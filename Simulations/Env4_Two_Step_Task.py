@@ -146,7 +146,7 @@ class Two_Step_Task(Env):
     
     def trial(self,action):
         if (self.state == S_1):
-                self.possible_switch()
+            self.possible_switch()
         # do one action in S_1, and keep track of the perceptually distinguishable state you arive in
         observation,_,_,_ = self.step(action)
         # do the same action in the resulting state (S_2 or S_3). The action doesn't matter, the reward does
