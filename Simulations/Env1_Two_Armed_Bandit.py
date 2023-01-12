@@ -49,15 +49,15 @@ class Two_Armed_Bandit(Env):
     def trial(self,action):
         self.timestep += 1    
         
-        self.action_counter[action] += 1
         if self.last_seen[action] == 0: 
             self.last_seen_counter[action] += 1
-        # p_action = 1 - np.power((1-self.baseline_prob[action]),
-        #                         self.last_seen_counter[action]+1)
-        
         p_action = 1 - np.power((1-self.baseline_prob[action]),
-                                self.last_seen[action]+1)
+                                self.action_counter[action]+1)
         
+        # p_action = 1 - np.power((1-self.baseline_prob[action]),
+        #                         self.last_seen[action]+1)
+        
+        self.action_counter[action] += 1
         reward = int(np.random.rand() < p_action)
         self.reward_counter[action] += reward
         
